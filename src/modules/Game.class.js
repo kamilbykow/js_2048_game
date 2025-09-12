@@ -5,7 +5,7 @@
  * Now it has a basic structure, that is needed for testing.
  * Feel free to add more props and methods if needed.
  */
-class Game {
+export class Game {
   /**
    * Creates a new game instance.
    *
@@ -21,9 +21,6 @@ class Game {
    * initial state.
    */
   constructor(initialState) {
-    // eslint-disable-next-line no-console
-    console.log(initialState);
-
     this.board = initialState || [
       [0, 0, 0, 0],
       [0, 0, 0, 0],
@@ -32,35 +29,36 @@ class Game {
     ];
   }
   status = 'idle';
+  score = 0;
 
-  drawBoard() {
-    const tableBody = document.querySelector('tbody');
+  // drawBoard() {
+  //   const tableBody = document.querySelector('tbody');
 
-    if (tableBody.children.length === 4) {
-      tableBody.innerHTML = '';
-    }
+  //   if (tableBody.children.length === 4) {
+  //     tableBody.innerHTML = '';
+  //   }
 
-    for (let i = 0; i < this.board.length; i++) {
-      const row = document.createElement('tr');
+  //   for (let i = 0; i < this.board.length; i++) {
+  //     const row = document.createElement('tr');
 
-      row.className = 'field-row';
+  //     row.className = 'field-row';
 
-      tableBody.append(row);
+  //     tableBody.append(row);
 
-      for (let j = 0; j < this.board[i].length; j++) {
-        const cell = document.createElement('td');
+  //     for (let j = 0; j < this.board[i].length; j++) {
+  //       const cell = document.createElement('td');
 
-        cell.className =
-          this.board[i][j] > 0
-            ? `field-cell field-cell--${this.board[i][j]}`
-            : 'field-cell';
+  //       cell.className =
+  //         this.board[i][j] > 0
+  //           ? `field-cell field-cell--${this.board[i][j]}`
+  //           : 'field-cell';
 
-        cell.innerHTML = this.board[i][j] > 0 ? `${this.board[i][j]}` : '';
+  //       cell.innerHTML = this.board[i][j] > 0 ? `${this.board[i][j]}` : '';
 
-        row.append(cell);
-      }
-    }
-  }
+  //       row.append(cell);
+  //     }
+  //   }
+  // }
 
   spawnNumber() {
     const emptyCell = [];
@@ -80,6 +78,7 @@ class Game {
     const randomFour = Math.floor(Math.random() * 10);
 
     this.board[randRow][randIndex] = randomFour === 9 ? 4 : 2;
+    this.score += randomFour === 9 ? 4 : 2;
   }
 
   rowToColumns(arr) {
@@ -143,7 +142,6 @@ class Game {
     this.board = brd;
 
     this.spawnNumber();
-    this.drawBoard();
 
     const boardIsFull = !brd
       .reduce((a, b) => [...a, ...b])
@@ -151,10 +149,10 @@ class Game {
 
     let hasHorizontalPair = false;
     let hasVerticalPair = false;
-    const fullBoardHorizontal = JSON.parse(JSON.stringify(this.board));
+    const fullBoardHorizontal = this.board;
     const fullBoardVertical = this.rowToColumns(this.board);
 
-    for (let i = 0; i < fullBoardHorizontal.length - 1; i++) {
+    for (let i = 0; i < fullBoardHorizontal.length; i++) {
       for (let j = 0; j < fullBoardHorizontal[i].length - 1; j++) {
         if (fullBoardHorizontal[i][j] === fullBoardHorizontal[i][j + 1]) {
           hasHorizontalPair = true;
@@ -191,7 +189,7 @@ class Game {
    * @returns {number}
    */
   getScore() {
-    return this.board.reduce((a, b) => [...a, ...b]).reduce((a, b) => a + b);
+    return this.score;
   }
 
   /**
@@ -222,7 +220,6 @@ class Game {
     this.status = 'playing';
     this.spawnNumber();
     this.spawnNumber();
-    this.drawBoard();
   }
 
   /**
@@ -235,6 +232,7 @@ class Game {
       [0, 0, 0, 0],
       [0, 0, 0, 0],
     ];
+    this.score = 0;
     this.start();
   }
   // Add your own methods here
