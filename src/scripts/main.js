@@ -1,11 +1,11 @@
 'use strict';
 
 // Uncomment the next lines to use your game instance in the browser
-import Game from '../modules/Game.class';
+import Game from '../modules/Game.class.js';
 
 const game = new Game([
-  [0, 0, 0, 2],
-  [0, 0, 0, 2],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
   [0, 0, 0, 0],
   [0, 0, 0, 0],
 ]);
@@ -29,22 +29,23 @@ function drawBoard() {
     tableBoard.innerHTML = '';
   }
 
-  for (let i = 0; i < game.board.length; i++) {
+  for (let i = 0; i < game.getState().length; i++) {
     const row = document.createElement('tr');
 
     row.className = 'field-row';
 
     tableBoard.append(row);
 
-    for (let j = 0; j < game.board[i].length; j++) {
+    for (let j = 0; j < game.getState()[i].length; j++) {
       const cell = document.createElement('td');
 
       cell.className =
-        game.board[i][j] > 0
-          ? `field-cell field-cell--${game.board[i][j]}`
+        game.getState()[i][j] > 0
+          ? `field-cell field-cell--${game.getState()[i][j]}`
           : 'field-cell';
 
-      cell.innerHTML = game.board[i][j] > 0 ? `${game.board[i][j]}` : '';
+      cell.innerHTML =
+        game.getState()[i][j] > 0 ? `${game.getState()[i][j]}` : '';
 
       row.append(cell);
     }
@@ -61,6 +62,7 @@ startButton.addEventListener('click', () => {
   if (btn === 'start') {
     game.start();
     drawBoard();
+    messageStart.classList.add('hidden');
     gameScore.textContent = game.getScore();
   }
 
@@ -96,7 +98,6 @@ document.addEventListener('keydown', (e) => {
     if (JSON.stringify(prevState) !== JSON.stringify(game.getState())) {
       startButton.classList.replace('start', 'restart');
       startButton.textContent = 'Restart';
-      messageStart.classList.add('hidden');
       drawBoard();
       gameScore.textContent = game.getScore();
 
@@ -107,11 +108,9 @@ document.addEventListener('keydown', (e) => {
   switch (game.getStatus()) {
     case 'lose':
       messageLose.classList.remove('hidden');
-      messageStart.classList.remove('hidden');
       break;
     case 'win':
       messageWin.classList.remove('hidden');
-      messageStart.classList.remove('hidden');
       break;
   }
 });

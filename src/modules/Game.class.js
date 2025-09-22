@@ -20,18 +20,23 @@ export default class Game {
    * If passed, the board will be initialized with the provided
    * initial state.
    */
-  constructor(initialState) {
+  constructor(
+    initialState = [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ],
+  ) {
     this.initialState = initialState;
     this.board = JSON.parse(JSON.stringify(initialState));
-
-    this.score = this.board
-      .reduce((a, b) => [...a, ...b])
-      .reduce((a, b) => a + b);
 
     this.status = this.board.reduce((a, b) => [...a, ...b]).includes(2048)
       ? 'win'
       : 'idle';
   }
+
+  score = 0;
 
   spawnNumber() {
     const emptyCell = [];
@@ -44,13 +49,15 @@ export default class Game {
         // eslint-disable-next-line prettier/prettier
       }));
 
-    const randomCell = Math.floor(Math.random() * emptyCell.length);
+    if (emptyCell.length > 0) {
+      const randomCell = Math.floor(Math.random() * emptyCell.length);
 
-    const [randRow, randIndex] = emptyCell[randomCell];
+      const [randRow, randIndex] = emptyCell[randomCell];
 
-    const randomFour = Math.floor(Math.random() * 10);
+      const randomFour = Math.floor(Math.random() * 10);
 
-    this.board[randRow][randIndex] = randomFour === 9 ? 4 : 2;
+      this.board[randRow][randIndex] = randomFour === 9 ? 4 : 2;
+    }
   }
 
   rowToColumns(arr) {
@@ -85,6 +92,8 @@ export default class Game {
           row[j] += row[j + 1];
           row[j + 1] = 0;
 
+          this.score += row[j];
+
           if (row[j] === 2048) {
             this.status = 'win';
           }
@@ -114,10 +123,6 @@ export default class Game {
     this.board = brd;
 
     this.spawnNumber();
-
-    this.score = this.board
-      .reduce((a, b) => [...a, ...b])
-      .reduce((a, b) => a + b);
 
     const boardIsFull = !brd
       .reduce((a, b) => [...a, ...b])
@@ -199,10 +204,6 @@ export default class Game {
       this.spawnNumber();
       this.spawnNumber();
     }
-
-    this.score = this.board
-      .reduce((a, b) => [...a, ...b])
-      .reduce((a, b) => a + b);
   }
 
   /**
