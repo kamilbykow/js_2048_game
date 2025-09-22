@@ -5,7 +5,7 @@
  * Now it has a basic structure, that is needed for testing.
  * Feel free to add more props and methods if needed.
  */
-export class Game {
+export default class Game {
   /**
    * Creates a new game instance.
    *
@@ -21,44 +21,17 @@ export class Game {
    * initial state.
    */
   constructor(initialState) {
-    this.board = initialState || [
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-    ];
+    this.initialState = initialState;
+    this.board = JSON.parse(JSON.stringify(initialState));
+
+    this.score = this.board
+      .reduce((a, b) => [...a, ...b])
+      .reduce((a, b) => a + b);
+
+    this.status = this.board.reduce((a, b) => [...a, ...b]).includes(2048)
+      ? 'win'
+      : 'idle';
   }
-  status = 'idle';
-  score = 0;
-
-  // drawBoard() {
-  //   const tableBody = document.querySelector('tbody');
-
-  //   if (tableBody.children.length === 4) {
-  //     tableBody.innerHTML = '';
-  //   }
-
-  //   for (let i = 0; i < this.board.length; i++) {
-  //     const row = document.createElement('tr');
-
-  //     row.className = 'field-row';
-
-  //     tableBody.append(row);
-
-  //     for (let j = 0; j < this.board[i].length; j++) {
-  //       const cell = document.createElement('td');
-
-  //       cell.className =
-  //         this.board[i][j] > 0
-  //           ? `field-cell field-cell--${this.board[i][j]}`
-  //           : 'field-cell';
-
-  //       cell.innerHTML = this.board[i][j] > 0 ? `${this.board[i][j]}` : '';
-
-  //       row.append(cell);
-  //     }
-  //   }
-  // }
 
   spawnNumber() {
     const emptyCell = [];
@@ -78,7 +51,6 @@ export class Game {
     const randomFour = Math.floor(Math.random() * 10);
 
     this.board[randRow][randIndex] = randomFour === 9 ? 4 : 2;
-    this.score += randomFour === 9 ? 4 : 2;
   }
 
   rowToColumns(arr) {
@@ -93,7 +65,7 @@ export class Game {
 
   move(reverse = false, vertical = false) {
     let brd = this.board;
-    const prevBrd = [...this.board];
+    const prevBrd = JSON.parse(JSON.stringify(this.board));
 
     if (vertical) {
       brd = this.rowToColumns(brd);
@@ -142,6 +114,10 @@ export class Game {
     this.board = brd;
 
     this.spawnNumber();
+
+    this.score = this.board
+      .reduce((a, b) => [...a, ...b])
+      .reduce((a, b) => a + b);
 
     const boardIsFull = !brd
       .reduce((a, b) => [...a, ...b])
@@ -218,24 +194,24 @@ export class Game {
    */
   start() {
     this.status = 'playing';
-    this.spawnNumber();
-    this.spawnNumber();
+
+    if (this.board.reduce((a, b) => [...a, ...b]).every((a) => a === 0)) {
+      this.spawnNumber();
+      this.spawnNumber();
+    }
+
+    this.score = this.board
+      .reduce((a, b) => [...a, ...b])
+      .reduce((a, b) => a + b);
   }
 
   /**
    * Resets the game.
    */
   restart() {
-    this.board = [
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-    ];
+    this.board = JSON.parse(JSON.stringify(this.initialState));
     this.score = 0;
     this.start();
   }
   // Add your own methods here
 }
-
-module.exports = Game;

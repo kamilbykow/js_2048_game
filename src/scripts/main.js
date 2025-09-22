@@ -4,8 +4,8 @@
 import Game from '../modules/Game.class';
 
 const game = new Game([
-  [0, 0, 0, 0],
-  [0, 0, 0, 0],
+  [0, 0, 0, 2],
+  [0, 0, 0, 2],
   [0, 0, 0, 0],
   [0, 0, 0, 0],
 ]);
@@ -17,12 +17,16 @@ const gameScore = document.querySelector('.game-score');
 const messageWin = document.querySelector('.message-win');
 const messageLose = document.querySelector('.message-lose');
 const messageStart = document.querySelector('.message-start');
+const table = document.querySelector('.game-field');
+const tableBody = document.createElement('tbody');
+
+table.append(tableBody);
 
 function drawBoard() {
-  const tableBody = document.querySelector('tbody');
+  const tableBoard = document.querySelector('tbody');
 
-  if (tableBody.children.length === 4) {
-    tableBody.innerHTML = '';
+  if (tableBoard.children.length === 4) {
+    tableBoard.innerHTML = '';
   }
 
   for (let i = 0; i < game.board.length; i++) {
@@ -30,7 +34,7 @@ function drawBoard() {
 
     row.className = 'field-row';
 
-    tableBody.append(row);
+    tableBoard.append(row);
 
     for (let j = 0; j < game.board[i].length; j++) {
       const cell = document.createElement('td');
@@ -57,24 +61,22 @@ startButton.addEventListener('click', () => {
   if (btn === 'start') {
     game.start();
     drawBoard();
-    startButton.classList.replace('start', 'restart');
-    startButton.textContent = 'Restart';
-    messageStart.classList.add('hidden');
     gameScore.textContent = game.getScore();
   }
 
-  if (btn === 'reset') {
+  if (btn === 'restart') {
     game.restart();
     drawBoard();
     messageLose.classList.add('hidden');
     messageWin.classList.add('hidden');
+    messageStart.classList.add('hidden');
     gameScore.textContent = game.getScore();
   }
-
-  btn = 'reset';
 });
 
 document.addEventListener('keydown', (e) => {
+  const prevState = game.getState();
+
   if (game.getStatus() === 'playing') {
     switch (e.key) {
       case 'ArrowRight':
@@ -90,17 +92,26 @@ document.addEventListener('keydown', (e) => {
         game.moveDown();
         break;
     }
-  }
 
-  drawBoard();
-  gameScore.textContent = game.getScore();
+    if (JSON.stringify(prevState) !== JSON.stringify(game.getState())) {
+      startButton.classList.replace('start', 'restart');
+      startButton.textContent = 'Restart';
+      messageStart.classList.add('hidden');
+      drawBoard();
+      gameScore.textContent = game.getScore();
+
+      btn = 'restart';
+    }
+  }
 
   switch (game.getStatus()) {
     case 'lose':
       messageLose.classList.remove('hidden');
+      messageStart.classList.remove('hidden');
       break;
     case 'win':
       messageWin.classList.remove('hidden');
+      messageStart.classList.remove('hidden');
       break;
   }
 });
